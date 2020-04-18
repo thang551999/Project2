@@ -20,7 +20,7 @@ export default class ui extends Component {
                         <View style={styles.logoContainer}>
                             <View style={styles.logoContainer}>
                                 <Image style={styles.logo}
-                                    source={image}>
+                                    source={require("../../image/logo.png")}>
                                 </Image>
 
                             </View>

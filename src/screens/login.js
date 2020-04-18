@@ -51,7 +51,7 @@ export default class login extends Component {
     return (
       <View style={styles.screen}>
         <View style={styles.image}>
-          <Image source={image} style={styles.images} />
+          <Image source={require("../../image/logo.png")} style={styles.images} />
         </View>
         <View style={styles.input}>
           <TextInput
@@ -77,14 +77,14 @@ export default class login extends Component {
             }
           />
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <Button
+            {/* <Button
               style={{ marginTop: 10, padding: 10, borderRadius: 30 }}
               title="Đăng Nhập"
               onPress={this.onLogin}
 
-            />
+            /> */}
             <Button
-              style={{ marginTop: 10, padding: 10, borderRadius: 30 }}
+              style={{ marginTop: 20, padding: 20, borderRadius: 30 }}
               title="Đăng Nhập"
               onPress={() => this.props.navigation.navigate("List")}
 
@@ -98,12 +98,17 @@ export default class login extends Component {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: 'white',
   },
   image: {
     height: 300,
   },
   images: {
-    flex: 1,
+
+    width: 225,
+    height: 225,
+    margin: 80,
+
   },
 
   TextInput: {

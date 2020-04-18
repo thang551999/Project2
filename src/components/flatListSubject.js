@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, View, TextInput, TouchableOpacity, Button } from 'react-native';
 import subjectListData from '../common/datasubject';
+import firestore from '@react-native-firebase/firestore';
 
 class FlatListItem extends Component {
   render() {
@@ -12,13 +13,13 @@ class FlatListItem extends Component {
           Giảng Viên : {this.props.item.teacher}
         </Text>
         <Text style={styles.flatListItem}>
-          Mã Lớp : {this.props.item.malop}
+          Mã môn học: {this.props.item.malop}
         </Text>
         <TouchableOpacity
           onPress={this.props.onPress}
         >
           <Text style={styles.lambai} >
-            {this.props.item.trangthailambt == 'Chưa' ? "Ấn vào đây để làm bài Kiểm tra" : ""}
+            {this.props.item.trangthailambt == '0' ? "Ấn vào đây để làm bài Kiểm tra" : ""}
           </Text>
         </TouchableOpacity>
       </View>
@@ -51,10 +52,39 @@ const styles = StyleSheet.create({
 });
 
 export default class flatListSubject extends Component {
+  constructor(props) {
+    super(props);
+    this.state = ({
+      listsubject: [],
+      loading: false,
+    });
+    this.ref = firestore().collection('users')
+  }
+  componentDidMount() {
+    this.unsubscribe = this.ref.onSnapshot((querySnapshot) => {
+      const list = [];
+      querySnapshot.forEach((doc) => {
+        list.push({
+          malop: doc.data().malop,
+          namesubject: doc.data().namesubject,
+          teacher: doc.data().teacher,
+          trangthailambt: doc.data().trangthailambt,
+          key: doc.data().key,
+        });
+      });
+      this.setState({
+        listsubject: list,
+        loading: false,
+      });
+    });
+  }
+
   chuyen = () => {
     this.props.navigation.navigate('Do')
   }
+
   render() {
+
     return (
       <View style={{ flex: 1 }}>
         <Text style={{
@@ -80,7 +110,7 @@ export default class flatListSubject extends Component {
 
         <FlatList
           style={{ backgroundColor: 'gray' }}
-          data={subjectListData}
+          data={this.state.listsubject}
           renderItem={({ item, index }) => {
             return <FlatListItem
               item={item}
@@ -88,6 +118,7 @@ export default class flatListSubject extends Component {
               onPress={() => this.props.navigation.navigate('Do')}
             />;
           }}
+          keyExtractor={(item, index) => item.namesubject}
         />
       </View>
     );
