@@ -1,17 +1,19 @@
-import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, View, Button } from 'react-native';
+import React, {Component} from 'react';
+import {FlatList, StyleSheet, Text, View, Button} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import dethidata from '../common/dethidata';
-import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
-import { ScrollView } from 'react-native-gesture-handler';
+
+import RadioForm, {
+  RadioButton,
+  RadioButtonInput,
+  RadioButtonLabel,
+} from 'react-native-simple-radio-button';
+import {ScrollView} from 'react-native-gesture-handler';
 class FlatListItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      checked1: false,
-      checked2: true,
-      checked3: true,
-      checked4: true,
+      checked: 0,
+      // diem: 0,
       radio_props: [],
     };
   }
@@ -19,27 +21,25 @@ class FlatListItem extends Component {
     const bt = [];
     bt.push({
       label: this.props.item.A,
-      value: this.props.item.A
+      value: 'A',
     });
     bt.push({
       label: this.props.item.B,
-      value: this.props.item.A
+      value: 'B',
     });
     bt.push({
       label: this.props.item.C,
-      value: this.props.item.A
-
+      value: 'C',
     });
     bt.push({
       label: this.props.item.D,
-      value: this.props.item.A
+      value: 'D',
     });
 
     this.setState({
       radio_props: bt,
       loading: false,
     });
-
   }
   render() {
     return (
@@ -50,22 +50,43 @@ class FlatListItem extends Component {
           marginTop: 5,
           marginLeft: 5,
           marginRight: 5,
-          // this.props.index % 2 == 0 ? 'mediumseagreen' : 'tomato',
           borderRadius: 10,
         }}>
-
         <Text style={styles.flatListItem}>Câu : {this.props.index + 1}</Text>
         <Text style={styles.flatListItem}>{this.props.item.question}</Text>
         <RadioForm
           radio_props={this.state.radio_props}
           // RadioButtonLabel={this.state.radio_props}
-          initial={0}
-          onPress={(value) => { console.log(value) }}
+          initial={null}
+          onPress={(value) => {
+            if (value == this.props.item.DA && this.state.checked == 0) {
+              //chọn đúng
+              //  this.setState({diem: this.state.diem + 1});
+              this.props.tinhdiemcong();
+              this.setState({checked: 1});
+              //  console.log('1');
+            }
+            if (value != this.props.item.DA && this.state.checked == 1) {
+              //chọn đúng sửa thành chọn sai
+              //  this.setState({diem: this.state.diem - 1});
+              this.props.tinhdiemtru();
+              this.setState({checked: 0});
+              // console.log('0');
+            }
+            if (value != this.props.item.DA && this.state.checked == 0) {
+              //chọn sai
+              this.props.tinhdiem();
+              // this.setState({diem: this.state.diem + 0});
+              this.setState({checked: 0});
+              // console.log('0');
+            }
+          }}
         />
       </View>
     );
   }
 }
+
 const styles = StyleSheet.create({
   flatListItem: {
     color: 'black',
@@ -77,12 +98,32 @@ const styles = StyleSheet.create({
 export default class flatListdo extends Component {
   constructor(props) {
     super(props);
-    this.state = ({
+    this.state = {
       homework: [],
       loading: false,
-    });
-    this.ref = firestore().collection('homework')
+      diem: 0,
+      //  malop: this.props.route.params.itemId,
+    };
+    this.ref = firestore().collection(this.props.route.params.id);
   }
+
+  add = () => {
+    firestore()
+      .collection('users')
+      .doc('I34wHJS04h1UaQPSe43v')
+      .update({
+        diem: this.state.diem,
+        trangthailambt: 1,
+      })
+      .then((data) => {
+        console.log(`added data = ${data}`);
+      })
+      .catch((error) => {
+        console.log(`error adding Firestore document = ${error}`);
+      });
+    console.log(this.state.diem);
+    this.chuyenman();
+  };
   componentDidMount() {
     this.unsubscribe = this.ref.onSnapshot((querySnapshot) => {
       const bt = [];
@@ -93,7 +134,7 @@ export default class flatListdo extends Component {
           B: doc.data().B,
           C: doc.data().C,
           D: doc.data().D,
-
+          DA: doc.data().DA,
         });
       });
       this.setState({
@@ -102,9 +143,26 @@ export default class flatListdo extends Component {
       });
     });
   }
+
+  tinhdiemcong = () => {
+    this.setState({diem: this.state.diem + 1});
+    // console.log('cong');
+  };
+  tinhdiem = () => {
+    this.setState({diem: this.state.diem + 0});
+    //  console.log('tru');
+  };
+  tinhdiemtru = () => {
+    this.setState({diem: this.state.diem - 1});
+    // console.log('s');
+  };
+
+  chuyenman = () => {
+    this.props.navigation.navigate('List');
+  };
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: 'lightyellow  ' }}>
+      <View style={{flex: 1, backgroundColor: 'lightyellow  '}}>
         <View
           style={{
             backgroundColor: 'skyblue',
@@ -112,19 +170,27 @@ export default class flatListdo extends Component {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text style={{ fontSize: 25 }}> Trắc nghiệm</Text>
+          <Text style={{fontSize: 25}}> Trắc nghiệm</Text>
         </View>
+        {/* // <Text>{this.props.route.params.id}</Text> */}
         <ScrollView>
           <FlatList
             data={this.state.homework}
-            renderItem={({ item, index }) => {
-              console.log(`Item = ${JSON.stringify(item)}, index = ${index}`);
-              return <FlatListItem item={item} index={index} />;
+            renderItem={({item, index}) => {
+              return (
+                <FlatListItem
+                  item={item}
+                  index={index}
+                  // diem={this.props.diem}
+                  tinhdiemcong={() => this.tinhdiemcong()}
+                  tinhdiemtru={() => this.tinhdiemtru()}
+                  tinhdiem={() => this.tinhdiem()}
+                />
+              );
             }}
             keyExtractor={(item, index) => item.question}
           />
-          <Button title='Nộp Bài' onPress={() => this.props.navigation.navigate('List')}></Button>
-          <Button title=' Đăng Xuất' onPress={() => this.props.navigation.navigate('Home')}></Button>
+          <Button title=" Nộp Bài" onPress={() => this.add()}></Button>
         </ScrollView>
       </View>
     );

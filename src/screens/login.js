@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { StyleSheet, TextInput, Button } from 'react-native';
-import { View, Image, Alert } from 'react-native';
+import React, {Component} from 'react';
+import {StyleSheet, TextInput, Button} from 'react-native';
+import {View, Image, Alert} from 'react-native';
 import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 export default class login extends Component {
@@ -14,44 +14,62 @@ export default class login extends Component {
     };
   }
   onAnonymousLogin = () => {
-    firebase.auth().signInAnonymously()
+    firebase
+      .auth()
+      .signInAnonymously()
       .then(() => {
         console.log(`Login successfully`);
         this.setState({
           isAuthenticated: true,
         });
-        this.props.navigation.navigate('List')
+        this.props.navigation.navigate('List');
       })
       .catch((error) => {
         console.log(`Login failed. Error = ${error}`);
       });
-  }
+  };
   onRegister = () => {
-    firebase.auth().createUserWithEmailAndPassword(this.state.typedEmail, this.state.typedPassword)
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(
+        this.state.typedEmail,
+        this.state.typedPassword,
+      )
       .then((loggedInUser) => {
-        this.setState({ user: loggedInUser })
-        console.log(`Register with user : ${JSON.stringify(loggedInUser.toJSON())}`);
-      }).catch((error) => {
+        this.setState({user: loggedInUser});
+        console.log(
+          `Register with user : ${JSON.stringify(loggedInUser.toJSON())}`,
+        );
+      })
+      .catch((error) => {
         console.log(`Register fail with error: ${error}`);
       });
-  }
+  };
   onLogin = () => {
-    firebase.auth().signInWithEmailAndPassword(this.state.typedEmail, this.state.typedPassword)
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(
+        this.state.typedEmail,
+        this.state.typedPassword,
+      )
       .then((loggedInUser) => {
-        this.setState({ isLogin: true, })
+        this.setState({isLogin: true});
         console.log(`Login with user : `);
-        this.props.navigation.navigate('List')
-      }).catch((error) => {
+        this.props.navigation.navigate('List');
+      })
+      .catch((error) => {
         console.log(`Login fail with error: ${error}`);
-        Alert.alert(
-          'Đăng Nhập Thất Bại');
+        Alert.alert('Đăng Nhập Thất Bại');
       });
-  }
+  };
   render() {
     return (
       <View style={styles.screen}>
         <View style={styles.image}>
-          <Image source={require("../../image/logo.png")} style={styles.images} />
+          <Image
+            source={require('../../image/logo.png')}
+            style={styles.images}
+          />
         </View>
         <View style={styles.input}>
           <TextInput
@@ -59,24 +77,20 @@ export default class login extends Component {
             autoFocus={true}
             keyboardType="email-address"
             placeholder="Enter your email"
-            onChangeText={
-              (text) => {
-                this.setState({ typedEmail: text });
-              }
-            }
+            onChangeText={(text) => {
+              this.setState({typedEmail: text});
+            }}
           />
 
           <TextInput
             style={styles.TextInput}
             placeholder="Enter your password"
             secureTextEntry
-            onChangeText={
-              (text) => {
-                this.setState({ typedPassword: text });
-              }
-            }
+            onChangeText={(text) => {
+              this.setState({typedPassword: text});
+            }}
           />
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
             {/* <Button
               style={{ marginTop: 10, padding: 10, borderRadius: 30 }}
               title="Đăng Nhập"
@@ -84,10 +98,9 @@ export default class login extends Component {
 
             /> */}
             <Button
-              style={{ marginTop: 20, padding: 20, borderRadius: 30 }}
+              style={{marginTop: 20, padding: 20, borderRadius: 30}}
               title="Đăng Nhập"
-              onPress={() => this.props.navigation.navigate("List")}
-
+              onPress={() => this.onLogin()}
             />
           </View>
         </View>
@@ -104,11 +117,9 @@ const styles = StyleSheet.create({
     height: 300,
   },
   images: {
-
     width: 225,
     height: 225,
     margin: 80,
-
   },
 
   TextInput: {
