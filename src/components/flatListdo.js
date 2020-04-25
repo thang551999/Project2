@@ -110,7 +110,7 @@ export default class flatListdo extends Component {
   add = () => {
     firestore()
       .collection('users')
-      .doc('I34wHJS04h1UaQPSe43v')
+      .doc(this.props.route.params.id)
       .update({
         diem: this.state.diem,
         trangthailambt: 1,
