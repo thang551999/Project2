@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  ActivityIndicator,
 } from 'react-native';
 import subjectListData from '../common/datasubject';
 import firestore from '@react-native-firebase/firestore';
@@ -87,18 +88,20 @@ export default class flatListSubject extends Component {
           trangthailambt: doc.data().trangthailambt,
           key: doc.data().key,
           diem: doc.data().diem,
+          time: doc.data().time,
         });
       });
       this.setState({
         listsubject: list,
-        loading: false,
+        loading: true,
       });
     });
   }
 
-  chuyen = (malop) => {
+  chuyen = (malop, time) => {
     this.props.navigation.navigate('Do', {
       id: malop,
+      time: time,
     });
   };
   setml = (malopmoi) => {
@@ -111,47 +114,46 @@ export default class flatListSubject extends Component {
   };
 
   render() {
-    return (
+    return this.state.loading == false ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          padding: 10,
+        }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    ) : (
       <View style={{flex: 1}}>
-        <Text
+        <View
           style={{
-            height: 40,
-            fontSize: 20,
-            paddingLeft: 80,
-            paddingTop: 5,
+            height: 50,
+
             backgroundColor: '#4169e1',
-            color: 'white',
             justifyContent: 'center',
-            alignContent: 'center',
             alignItems: 'center',
           }}>
-          Danh Sách Môn Học
-        </Text>
-        <TextInput
-          style={{
-            height: 40,
-            borderColor: 'gainsboro',
-            borderRadius: 10,
-            backgroundColor: 'white',
-          }}
-          placeholder="Tìm Kiếm Môn Học"
-        />
-
-        <FlatList
-          style={{backgroundColor: 'gray'}}
-          data={this.state.listsubject}
-          renderItem={({item, index}) => {
-            return (
-              <FlatListItem
-                item={item}
-                index={index}
-                //  setml={() => this.setml(item.malop)}
-                chuyen={() => this.chuyen(item.malop)}
-              />
-            );
-          }}
-          keyExtractor={(item, index) => item.namesubject}
-        />
+          <Text style={{fontSize: 20, color: 'white'}}>Danh Sách Môn Học</Text>
+        </View>
+        <View>
+          <FlatList
+            style={{backgroundColor: 'gray'}}
+            data={this.state.listsubject}
+            renderItem={({item, index}) => {
+              return (
+                <FlatListItem
+                  item={item}
+                  index={index}
+                  //  setml={() => this.setml(item.malop)}
+                  chuyen={() => this.chuyen(item.malop, item.time)}
+                />
+              );
+            }}
+            keyExtractor={(item, index) => item.namesubject}
+          />
+        </View>
       </View>
     );
   }

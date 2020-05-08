@@ -1,7 +1,14 @@
 import React, {Component} from 'react';
-import {FlatList, StyleSheet, Text, View, Button} from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  ActivityIndicator,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-
+import CountDown from 'react-native-countdown-component';
 import RadioForm, {
   RadioButton,
   RadioButtonInput,
@@ -100,6 +107,7 @@ export default class flatListdo extends Component {
     super(props);
     this.state = {
       homework: [],
+
       loading: false,
       diem: 0,
       //  malop: this.props.route.params.itemId,
@@ -139,7 +147,7 @@ export default class flatListdo extends Component {
       });
       this.setState({
         homework: bt,
-        loading: false,
+        loading: true,
       });
     });
   }
@@ -161,8 +169,19 @@ export default class flatListdo extends Component {
     this.props.navigation.navigate('List');
   };
   render() {
-    return (
-      <View style={{flex: 1, backgroundColor: 'lightyellow  '}}>
+    return this.state.loading == false ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          padding: 10,
+        }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    ) : (
+      <View style={{flex: 1, backgroundColor: 'lightyellow '}}>
         <View
           style={{
             backgroundColor: 'skyblue',
@@ -170,7 +189,21 @@ export default class flatListdo extends Component {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text style={{fontSize: 25}}> Trắc nghiệm</Text>
+          <Text style={{fontSize: 25, marginBottom: 5}}> Trắc nghiệm</Text>
+        </View>
+        <View style={{flexDirection: 'row', margin: 5}}>
+          <Text style={{fontSize: 20, marginRight: 10}}>
+            Thời Gian Còn Lại :
+          </Text>
+          <CountDown
+            until={this.props.route.params.time * 60}
+            size={20}
+            onFinish={() => this.add()}
+            digitStyle={{backgroundColor: 'skyblue'}}
+            digitTxtStyle={{color: 'black'}}
+            timeToShow={['M', 'S']}
+            timeLabels={{m: 'Phút', s: 'Giây'}}
+          />
         </View>
         {/* // <Text>{this.props.route.params.id}</Text> */}
         <ScrollView>
@@ -190,6 +223,7 @@ export default class flatListdo extends Component {
             }}
             keyExtractor={(item, index) => item.question}
           />
+
           <Button title=" Nộp Bài" onPress={() => this.add()}></Button>
         </ScrollView>
       </View>

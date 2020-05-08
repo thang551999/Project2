@@ -98,7 +98,7 @@ export default class login extends Component {
 
             /> */}
             <Button
-              style={{marginTop: 20, padding: 20, borderRadius: 30}}
+              style={{marginTop: 20, padding: 20, borderRadius: 50}}
               title="Đăng Nhập"
               onPress={() => this.onLogin()}
             />
